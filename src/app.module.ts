@@ -1,8 +1,17 @@
 import { Module } from '@nestjs/common';
-import { BullModule } from '@nestjs/bull';
+import { BullModule, Process, Processor } from '@nestjs/bull';
+import { Job } from 'bull';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
+@Processor('test-queue')
+class QueueConsumer {
+  @Process('test-job')
+  handleEvent(job: Job) {
+    console.log('Processing job', job);
+  }
+}
 
 @Module({
   imports: [
@@ -10,8 +19,9 @@ import { AppService } from './app.service';
       name: 'test-queue',
     }),
   ],
+  providers: [QueueConsumer],
 })
-export class QueueModule {}
+class QueueModule {}
 
 @Module({
   imports: [
